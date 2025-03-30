@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/waditya/go-mux-basic-rest-api-project/store"
+	"github.com/waditya/go-mux-basic-rest-api-project/internal/store"
 )
 
 func main() {
