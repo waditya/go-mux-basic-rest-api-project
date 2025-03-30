@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/waditya/go-mux-basic-rest-api-project/internal/store"
 )
 
@@ -30,18 +31,28 @@ func getAllProductsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getProductHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Endpoint hit : getProduct , URL Path : ", r.URL.Path)
-	key, err := strconv.Atoi(r.URL.Path[len("/product/"):])
+	vars := mux.Vars(r)
+	key, err := strconv.Atoi(vars["id"])
 
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
+	log.Println("Endpoint hit : getProduct , URL Path : ", r.URL.Path)
+
+	// Below code is for default Mux -- ServeMux
+	/* key, err := strconv.Atoi(r.URL.Path[len("/product/"):])
+
+	if err != nil {
+		log.Println(err)
+		return
+	} */
+
 	for _, product := range Products {
 		if int(product.Id) == key {
 			json.NewEncoder(w).Encode(product)
-		}
+		} // Add a else case for product not found
 	}
 
 }
@@ -52,11 +63,19 @@ func requestsHandler() {
 	// Use HandleFunc will register the handler function for the given pattern
 	// handler function handles the requests coming at a given endpoint
 	// In nut-shell, Handler Func ties request to a specific endpoint to a particular Handler Function
-	http.HandleFunc("/products", getAllProductsHandler)
-	http.HandleFunc("/product/", getProductHandler)
-	http.HandleFunc("/", homePageHandler) // homepageHandler is the handler function
 
-	http.ListenAndServe("localhost:10000", nil)
+	// Create a new instance of mux Router
+	muxRouter := mux.NewRouter().StrictSlash(true) // StrictSlash defines the trailing slash behavior for new routes. The initial value is false.
+
+	muxRouter.HandleFunc("/products", getAllProductsHandler)
+	muxRouter.HandleFunc("/product/{id}", getProductHandler)
+	muxRouter.HandleFunc("/", homePageHandler) // homepageHandler is the handler function
+
+	// http.HandleFunc("/products", getAllProductsHandler)
+	// http.HandleFunc("/product/", getProductHandler)
+	// http.HandleFunc("/", homePageHandler) // homepageHandler is the handler function
+
+	http.ListenAndServe("localhost:10000", muxRouter)
 
 }
 
