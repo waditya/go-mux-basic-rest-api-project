@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/waditya/go-mux-basic-rest-api-project/internal/database"
 	"github.com/waditya/go-mux-basic-rest-api-project/internal/store"
 )
 
@@ -88,5 +89,8 @@ func main() {
 		store.Product{Id: 2, Name: "Table", Quantity: 25, Price: 400},
 	}
 
+	database.NewMySql()
+
 	requestsHandler()
+
 }
